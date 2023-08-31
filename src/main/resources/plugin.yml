@@ -1,0 +1,8 @@
+name: aKilleffect
+version: '${project.version}'
+author: 73m9
+description: A Killeffect made by Aynclub
+main: com.aynclub.akilleffect.Main
+commands:
+  akilleffect:
+    aliases: ak
