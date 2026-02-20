@@ -1,33 +1,31 @@
-package com.aynclub.akilleffect;
+package com.aynclub.akilleffect.core;
 
-import com.aynclub.akilleffect.Command.ConfigChecker;
-import com.aynclub.akilleffect.Command.Help;
-import com.aynclub.akilleffect.database.FlatFile;
-import com.aynclub.akilleffect.effect.MainEffectKill;
-import com.aynclub.akilleffect.event.Events;
+import com.aynclub.akilleffect.commands.ConfigChecker;
+import com.aynclub.akilleffect.commands.Help;
+import com.aynclub.akilleffect.managers.FlatFile;
+import com.aynclub.akilleffect.effects.MainEffectKill;
+import com.aynclub.akilleffect.events.Events;
 import com.aynclub.akilleffect.utils.Manager;
 import com.aynclub.akilleffect.utils.Utils;
-import com.aynclub.akilleffect.utils.config.YAMLUtils;
+import com.aynclub.akilleffect.utils.YAMLUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
-import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Main extends JavaPlugin {
 
-    public static String prefix;
+    public static String PREFIX;
     private static Main instance;
     private static Manager manager;
-    private final Map<String, MainEffectKill> effectkill = new HashMap<>();
+    private final Map<String, MainEffectKill> effectKillMap = new HashMap<>();
     private String token;
 
     public static Main getInstance() {
@@ -49,23 +47,19 @@ public class Main extends JavaPlugin {
 
         String version = getDescription().getVersion();
         if (!Main.get().getDescription().getAuthors().contains("73m9")) {
-            Bukkit.getConsoleSender().sendMessage("");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "aKilleffect" + " V" + version);
-            Bukkit.getConsoleSender().sendMessage("");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "DON'T CHANGE PLUGIN.YML!");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "CHECK PLUGIN.YML AND TRY AGAIN!");
-            Bukkit.getConsoleSender().sendMessage("");
+            getLogger().severe("");
+            getLogger().severe("aKilleffect V" + version);
+            getLogger().severe("");
+            getLogger().severe("");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
         if (!Main.get().getDescription().getName().contains("aKilleffect")) {
-            Bukkit.getConsoleSender().sendMessage("");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "aKilleffect" + " V" + version);
-            Bukkit.getConsoleSender().sendMessage("");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "DON'T CHANGE PLUGIN.YML!");
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "CHECK PLUGIN.YML AND TRY AGAIN!");
-            Bukkit.getConsoleSender().sendMessage("");
+            getLogger().severe("");
+            getLogger().severe("aKilleffect V" + version);
+            getLogger().severe("");
+            getLogger().severe("");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -77,19 +71,17 @@ public class Main extends JavaPlugin {
         FileConfiguration config = getConfig();
         // 从config.yml中获取token的值
         token = config.getString("token");
-        System.out.println("-------------------------------------");
+        getLogger().info("-------------------------------------");
         getLogger().info("Verifier: Please stand by......");
         getLogger().info("Your Token: " + token);
-        Bukkit.getConsoleSender().sendMessage("");
+        getLogger().info("");
         if (!new ConfigChecker(token, "http://v.ayn.asia/verify.php", this).setConsoleLog(ConfigChecker.LogType.LOW).register()) return;
 
         getServer().getPluginManager().registerEvents(new Events(), this);
-        CommandExecutor executor = new Help();
-        getCommand("akilleffect").setExecutor(executor);
         manager.loadMinions();
         Manager.buildConfigs("messages");
         FlatFile.checkDatabase();
-        prefix = Utils.colorize((String) Utils.gfc("messages", "prefix"));
+        PREFIX = Utils.colorize((String) Utils.gfc("messages", "prefix"));
         Bukkit.getOnlinePlayers().forEach(p -> FlatFile.getValue(p.getUniqueId()));
 
 
@@ -119,7 +111,7 @@ public class Main extends JavaPlugin {
     }
 
     public Map<String, MainEffectKill> getEffectKill() {
-        return effectkill;
+        return effectKillMap;
     }
 
     //验证
